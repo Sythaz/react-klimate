@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import Layout from "./components/layout";
-import { ThemeProvider } from "./components/theme-provider";
+import { ThemeProvider } from "./context/theme-provider";
 import CityPage from "./pages/city-page";
 import WeatherDashboard from "./pages/weather-dashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<WeatherDashboard />} />
+              <Route path="/city" element={<CityPage />} />
               <Route path="/city/:cityName" element={<CityPage />} />
             </Routes>
           </Layout>

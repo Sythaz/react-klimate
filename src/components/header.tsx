@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { useTheme } from "./theme-provider";
+import { useTheme } from "../context/theme-provider";
 import { Moon, Sun } from "lucide-react";
 
 const Header = () => {
