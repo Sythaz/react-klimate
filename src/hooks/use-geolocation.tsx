@@ -88,6 +88,23 @@ export function useGeolocation() {
 
   useEffect(() => {
     getLocation();
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then((permissionStatus) => {
+          // Listener: jika permission berubah, jalankan ini
+          permissionStatus.addEventListener("change", () => {
+            console.log("Permission changed to:", permissionStatus.state);
+            if (permissionStatus.state === "granted") {
+              getLocation(); // ← Auto refresh saat user allow!
+            }
+          });
+        })
+        .catch((err) => {
+          console.log("Permission API not supported:", err);
+        });
+    }
   }, []);
 
   return {
