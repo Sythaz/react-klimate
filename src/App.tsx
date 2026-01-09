@@ -6,7 +6,20 @@ import WeatherDashboard from "./pages/weather-dashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Saat user ke tab lain dan kembali ke tab ini, data tidak langsung di-fetch ulang selama belum 5 menit (spt cache)
+      staleTime: 1000 * 60 * 5, // 5 menit
+      // Data yang sudah di-fetch akan disimpan di cache selama 10 menit dan akan dihapus setelah itu
+      gcTime: 1000 * 60 * 10, // 10 menit
+      // Tidak perlu di-fetch ulang jika ada error
+      refetchOnWindowFocus: false,
+      // Tidak perlu di-fetch ulang jika ada error
+      retry: false,
+    },
+  },
+});
 
 function App() {
   return (

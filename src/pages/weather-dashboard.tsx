@@ -3,6 +3,11 @@ import { Button } from "../components/ui/button";
 import { useGeolocation } from "../hooks/use-geolocation";
 import WeatherSkeleton from "../components/loading-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import {
+  useForecastQuery,
+  useReverseGeocodeQuery,
+  useWeatherQuery,
+} from "../hooks/use-weather";
 
 const WeatherDashboard = () => {
   const {
@@ -12,24 +17,31 @@ const WeatherDashboard = () => {
     isLoading: locationLoading,
   } = useGeolocation();
 
-  console.log("WeatherDashboard render");
-  console.log({ coordinates });
+  // Memanggil forecast query untuk mendapatkan data perkiraan cuaca dari koordinat yang didapatkan
+  const forecastQuery = useForecastQuery(coordinates!);
+
+  // Memanggil weather query untuk mendapatkan data cuaca dari koordinat yang didapatkan
+  const weatherQuery = useWeatherQuery(coordinates!);
+
+  // Memanggil reverse geocoding untuk mendapatkan nama lokasi dari koordinat yang didapatkan
+  const locationQuery = useReverseGeocodeQuery(coordinates!);
+
+  console.log({
+    coordinates: coordinates,
+    locationQueryData: locationQuery.data,
+    weatherQueryData: weatherQuery.data,
+    forecastQueryData: forecastQuery.data,
+  });
 
   const handleRefresh = () => {
-    if (locationError) {
-      // Minta permission lagi jika belum diberikan
-      navigator.permissions
-        .query({ name: "geolocation" })
-        .then((result) => {
-          if (result.state === "prompt" || result.state === "denied") {
-            getLocation();
-          }
-        })
-        .catch(() => {
-          getLocation();
-        });
-    } else {
-      getLocation();
+    // Selalu refresh lokasi terlebih dahulu
+    getLocation();
+
+    // Jika sudah ada koordinat, refresh juga data cuaca
+    if (coordinates) {
+      weatherQuery.refetch();
+      forecastQuery.refetch();
+      locationQuery.refetch();
     }
   };
 
@@ -69,6 +81,12 @@ const WeatherDashboard = () => {
     );
   }
 
+  const isRefreshing =
+    locationLoading ||
+    weatherQuery.isFetching ||
+    forecastQuery.isFetching ||
+    locationQuery.isFetching;
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -77,10 +95,24 @@ const WeatherDashboard = () => {
           variant={"outline"}
           size={"icon"}
           onClick={handleRefresh}
-          disabled={locationLoading}
+          disabled={isRefreshing}
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw
+            className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+          />
         </Button>
+      </div>
+
+      <div className="grid gap-6">
+        <div>
+          {/* current weather  */}
+          {/* hourly forecast */}
+        </div>
+
+        <div>
+          {/* details  */}
+          {/* forecast */}
+        </div>
       </div>
     </div>
   );

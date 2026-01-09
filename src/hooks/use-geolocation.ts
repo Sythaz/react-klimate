@@ -15,11 +15,10 @@ export function useGeolocation() {
     // Initial state
     coordinates: null,
     error: null,
-    isLoading: false,
+    isLoading: true,
   });
 
   const getLocation = () => {
-    console.log("useGeolocation: getLocation called");
     setLocationData((prev) => ({
       ...prev,
       isLoading: true,
@@ -71,7 +70,7 @@ export function useGeolocation() {
             break;
         }
 
-        console.log("useGeolocation: getCurrentPosition error", errorMessage);
+        // console.log("useGeolocation: getCurrentPosition error", errorMessage);
         setLocationData({
           coordinates: null,
           error: errorMessage,
