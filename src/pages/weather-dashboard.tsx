@@ -8,6 +8,8 @@ import {
   useReverseGeocodeQuery,
   useWeatherQuery,
 } from "../hooks/use-weather";
+import CurrentWeather from "../components/current-weather";
+import HourlyTemperature from "../components/hourly-temperature";
 
 const WeatherDashboard = () => {
   const {
@@ -81,6 +83,28 @@ const WeatherDashboard = () => {
     );
   }
 
+  const locationName = locationQuery.data?.[0];
+
+  if (weatherQuery.error || forecastQuery.error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4 mr-2" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription className="flex flex-col gap-4">
+          <p>Failed to fetch weather data. Please try again.</p>
+          <Button variant="outline" onClick={handleRefresh} className="w-fit">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!weatherQuery.data || !forecastQuery.data) {
+    return <WeatherSkeleton />;
+  }
+
   const isRefreshing =
     locationLoading ||
     weatherQuery.isFetching ||
@@ -89,7 +113,7 @@ const WeatherDashboard = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-5">
         <h1 className="text-xl font-bold tracking-tight">My Location</h1>
         <Button
           variant={"outline"}
@@ -105,7 +129,12 @@ const WeatherDashboard = () => {
 
       <div className="grid gap-6">
         <div>
-          {/* current weather  */}
+          <CurrentWeather
+            data={weatherQuery.data}
+            locationName={locationName!}
+          />
+
+          <HourlyTemperature data={forecastQuery.data} />
           {/* hourly forecast */}
         </div>
 
