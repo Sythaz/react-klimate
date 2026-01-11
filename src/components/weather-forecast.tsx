@@ -24,33 +24,35 @@ interface DailyForecast {
 const formatTemp = (temp: number) => `${Math.round(temp)}°C`;
 
 const WeatherForecast = ({ data }: WeatherForecastProps) => {
-  // Jelaskan mengapa pakai list dan juga reduce, fungsi reduce disini apa dan juga acc serta forecast disini tuh apa?
+  // Kita memiliki list yang memiliki banyak data, sehingga reduce berfungsi untuk mengelompokkan data
+  // acc itu singkatan dari accumulator, yaitu nilai yang dikumpulkan selama proses reduksi/iterasi/pengolahan data/perhitungan
+  // forecast itu adalah setiap item dalam list yang sedang diproses, semisal data ada 40 item, maka proses ini akan berjalan sebanyak 40 kali dan setiap kali memproses satu item yaitu forecast
   const dailyForecast = data.list.reduce((acc, forecast) => {
-    // Mengapa pakai forecast.dt? dan juga kenapa dikali 1000?
+    // Menggunakan dt dan bukan dt_txt, karena dt lebih mudah diolah dalam bentuk timestamp karena bentuknya angka/detik yang bisa diubah ke waktu mana saja
     const date = format(new Date(forecast.dt * 1000), "yyyy-MM-dd");
 
-    // Validasi ini untuk apa
+    // Saat tanggal belum ada di accumulator, maka buat object baru/inisialisasi
     if (!acc[date]) {
-      // Apakah ini artinya jika null maka buat object baru? dengna nilai dari forecast saat ini
+      // Inisialisasi object daily forecast untuk tanggal tersebut
       acc[date] = {
         temp_min: forecast.main.temp_min,
         temp_max: forecast.main.temp_max,
         humidity: forecast.main.humidity,
         wind: forecast.wind.speed,
-        // Mengapa menggunakan forecast.weather[0]?
         weather: forecast.weather[0],
-        // Mengapa pakai dt bukan dt_txt?
+        // Menggunakan dt dan bukan dt_txt, karena dt lebih mudah diolah dalam bentuk timestamp karena bentuknya angka/detik yang bisa diubah ke waktu mana saja
         date: forecast.dt,
       };
     } else {
+      // Jika sudah ada, maka update nilai min dan max temperatur saja
       acc[date].temp_min = Math.min(acc[date].temp_min, forecast.main.temp_min);
       acc[date].temp_max = Math.max(acc[date].temp_max, forecast.main.temp_max);
     }
 
-    // Return acc ini artinya apa, dan kenapa harus dikembalikan? siapa yang memerlukan nilai kembalian ini?
+    // Untuk melanjutkan proses reduksi ke item berikutnya dengan acc yang sudah diperbarui
     return acc;
-    // Ini untuk apa kok ada {}, jika diisi isinya apa?
-    // Kok ada as Record<string, DailyForecast>? Apa fungsi dari bagian ini? Apakah ini semacam casting dan kenapa perlu?
+    // {} di sini adalah nilai awal dari accumulator acc, jadi saat proses reduksi/iterasi/pengolahan data/perhitungan dimulai, acc akan dimulai dari object kosong {}
+    // Sebuah type casting di TypeScript. Fungsinya adalah untuk memberi tahu TypeScript bahwa acc adalah sebuah object yang memiliki string sebagai key (tanggal dalam format "yyyy-MM-dd") dan DailyForecast sebagai value-nya. Ini penting agar TypeScript bisa memahami tipe data dari acc selama proses reduksi, sehingga kita bisa mendapatkan manfaat dari fitur pengecekan tipe statis yang disediakan oleh TypeScript.
   }, {} as Record<string, DailyForecast>);
 
   const nextDays = Object.values(dailyForecast).slice(0, 6);
