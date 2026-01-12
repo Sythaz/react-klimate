@@ -103,7 +103,7 @@ const WeatherDashboard = () => {
     );
   }
 
-  if (!weatherQuery.data || !forecastQuery.data) {
+  if (!weatherQuery.data || !forecastQuery.data || !locationName) {
     return <WeatherSkeleton />;
   }
 
